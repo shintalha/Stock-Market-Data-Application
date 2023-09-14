@@ -21,10 +21,10 @@ public class Instrument {
     private String symbol;
 
     @Column(name = "full_name")
-    private String name;
+    private String fullName;
 
     @Column(name = "simple_name")
-    private String customName;
+    private String simpleName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "market_id")
