@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: 'postgres:15.3'
+    environment:
+      - 'POSTGRES_DB=stockmarketdb'
+      - 'POSTGRES_PASSWORD=postgres'
+      - 'POSTGRES_USER=talha'
+    ports:
+      - '5432:5432'
+
+  redis:
+    image: 'redis:7.0'
+    hostname: localhost
+    ports:
+      - '6379:6379'
+
+
