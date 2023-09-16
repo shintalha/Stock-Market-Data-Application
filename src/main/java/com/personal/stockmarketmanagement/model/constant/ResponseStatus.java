@@ -1,2 +1,6 @@
-package com.personal.stockmarketmanagement.model.constant;public enum ResponseStatus {
+package com.personal.stockmarketmanagement.model.constant;
+
+public enum ResponseStatus {
+    SUCCESS,
+    ERROR,
 }
