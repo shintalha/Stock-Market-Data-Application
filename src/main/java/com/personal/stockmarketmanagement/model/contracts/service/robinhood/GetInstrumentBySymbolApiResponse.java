@@ -1,4 +1,4 @@
-package com.personal.stockmarketmanagement.model.contracts.robinhood;
+package com.personal.stockmarketmanagement.model.contracts.service.robinhood;
 
 import com.personal.stockmarketmanagement.model.dto.RobinhoodInstrumentDto;
 import lombok.AllArgsConstructor;
