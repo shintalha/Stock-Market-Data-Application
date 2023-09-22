@@ -50,4 +50,8 @@ public class MarketService {
             throw new MarketDataSaveException(ex.getMessage());
         }
     }
+
+    public Optional<Market> getMarketByCode(String code) {
+        return marketRepository.getMarketByCode(code);
+    }
 }
