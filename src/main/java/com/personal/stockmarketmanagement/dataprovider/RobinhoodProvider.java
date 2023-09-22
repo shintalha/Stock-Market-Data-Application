@@ -1,7 +1,7 @@
 package com.personal.stockmarketmanagement.dataprovider;
 
-import com.personal.stockmarketmanagement.model.contracts.robinhood.GetInstrumentBySymbolApiResponse;
-import com.personal.stockmarketmanagement.model.contracts.robinhood.MarketsApiResponse;
+import com.personal.stockmarketmanagement.model.contracts.service.robinhood.GetInstrumentBySymbolApiResponse;
+import com.personal.stockmarketmanagement.model.contracts.service.robinhood.MarketsApiResponse;
 import com.personal.stockmarketmanagement.model.entity.Instrument;
 import com.personal.stockmarketmanagement.model.entity.Market;
 import com.personal.stockmarketmanagement.utility.RobinhoodUtil;
