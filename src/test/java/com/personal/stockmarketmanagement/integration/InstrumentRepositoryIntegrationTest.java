@@ -41,4 +41,26 @@ public class InstrumentRepositoryIntegrationTest {
         assertFalse(instrumentList.isEmpty());
         assertEquals(5, instrumentList.size());
     }
+
+    /**
+     * case: update entity successfully
+     */
+    @Test
+    @Sql("/scripts/seed-instrument.sql")
+    @Transactional
+    public void testUpdateInstrumentData() {
+        Long instrumentId = 2L;
+        String name = "Boeing Company";
+        String custom_name = "Boeing";
+        int market_id = 2;
+
+        instrumentRepository.updateInstrumentData(name, custom_name, market_id, instrumentId);
+
+        Instrument updatedInstrument = instrumentRepository.findById(2L).orElse(null);
+
+        assertEquals(name, updatedInstrument.getFullName());
+        assertEquals(custom_name, updatedInstrument.getSimpleName());
+        assertEquals(market_id, updatedInstrument.getMarket().getId());
+
+    }
 }
