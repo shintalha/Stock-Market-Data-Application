@@ -1,6 +1,7 @@
 package com.personal.stockmarketmanagement.unit;
 
 import com.personal.stockmarketmanagement.dataprovider.DataProvider;
+import com.personal.stockmarketmanagement.model.dto.InstrumentDto;
 import com.personal.stockmarketmanagement.model.entity.Instrument;
 import com.personal.stockmarketmanagement.model.entity.Market;
 import com.personal.stockmarketmanagement.repository.InstrumentRepository;
@@ -19,7 +20,9 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+import static com.personal.stockmarketmanagement.model.constant.ConstantParameter.DATABASE_ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -149,5 +152,95 @@ public class InstrumentServiceTest {
 
         verify(instrumentRepository, times(0)).updateInstrumentData("Boeing Company", "Boeing", 2, 1L);
     }
+
+    /**
+     * case : get all instruments from db
+     * condition : should return proper instrumentDto objects in list
+     */
+    @Test
+    public void testGetAllInstrumentsWithNonEmptyList() {
+        // Arrange
+        Instrument instrument1 = Instrument.builder()
+                .id(1)
+                .symbol("AAPL")
+                .simpleName("Apple")
+                .fullName("Apple Inc.")
+                .build();
+
+        Instrument instrument2 = Instrument.builder()
+                .id(2)
+                .symbol("GOOGL")
+                .simpleName("Alphabet")
+                .fullName("Alphabet Inc.")
+                .build();
+
+        List<Instrument> instrumentList = new ArrayList<>();
+        instrumentList.add(instrument1);
+        instrumentList.add(instrument2);
+
+        Mockito.when(instrumentRepository.findAll()).thenReturn(instrumentList);
+
+        List<InstrumentDto> instrumentDtoList = null;
+
+        // Act
+        try {
+            instrumentDtoList = instrumentService.getAllInstruments();
+        } catch (Exception ex) {}
+
+
+        // Assert
+        assertEquals(2, instrumentDtoList.size());
+
+        InstrumentDto dto1 = instrumentDtoList.get(0);
+        assertEquals(1, dto1.getId());
+        assertEquals("AAPL", dto1.getSymbol());
+        assertEquals("Apple", dto1.getSimpleName());
+        assertEquals("Apple Inc.", dto1.getFullName());
+        assertNull(dto1.getMarketId());
+
+        InstrumentDto dto2 = instrumentDtoList.get(1);
+        assertEquals(2, dto2.getId());
+        assertEquals("GOOGL", dto2.getSymbol());
+        assertEquals("Alphabet", dto2.getSimpleName());
+        assertEquals("Alphabet Inc.", dto2.getFullName());
+        assertNull(dto2.getMarketId());
+    }
+
+    /**
+     * case : there is no record on database
+     * condition : should return empty InstrumentDtoList
+     */
+    @Test
+    public void testGetAllInstrumentsWithEmptyList() throws Exception {
+        // Arrange
+        List<Instrument> instrumentList = new ArrayList<>();
+
+        Mockito.when(instrumentRepository.findAll()).thenReturn(instrumentList);
+
+        // Act
+        List<InstrumentDto> instrumentDtoList = null;
+        try {
+            instrumentDtoList = instrumentService.getAllInstruments();
+        } catch (Exception ex) {}
+
+        // Assertions
+        assertEquals(0, instrumentDtoList.size());
+    }
+
+    /**
+     * Error during database connection
+     * condition : should throw DatabaseConnectionException
+     */
+    @Test
+    public void testGetAllInstrumentsWithException() {
+        Mockito.when(instrumentRepository.findAll()).thenThrow(new RuntimeException("Database connection error"));
+
+        try {
+            instrumentService.getAllInstruments();
+        } catch (Exception ex) {
+            assertEquals(DATABASE_ERROR + " : " + "Database connection error", ex.getMessage() );
+        }
+    }
+
 
 }

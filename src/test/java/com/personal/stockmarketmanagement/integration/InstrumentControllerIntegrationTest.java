@@ -2,6 +2,7 @@ package com.personal.stockmarketmanagement.integration;
 
 import com.personal.stockmarketmanagement.model.constant.ResponseStatus;
 import com.personal.stockmarketmanagement.model.contracts.controller.ControllerResponse;
+import com.personal.stockmarketmanagement.model.dto.InstrumentDto;
 import com.personal.stockmarketmanagement.model.entity.Instrument;
 import com.personal.stockmarketmanagement.repository.InstrumentRepository;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,7 @@ public class InstrumentControllerIntegrationTest {
             .withDatabaseName("testdb")
             .withUsername("talha")
             .withPassword("postgres")
-            .withInitScript("./scripts/create-tables.sql");
+            .withInitScript("./scripts/init-all.sql");
     static {
         postgreSQLContainer.start();
     }
@@ -44,7 +45,6 @@ public class InstrumentControllerIntegrationTest {
      * condition : returns HttpStatus Ok and synced instrument data can be found in db
      */
     @Test
-    @Sql("/scripts/seed-instrument.sql")
     public void testSyncInstrumentDataWithSuccess() {
         ResponseEntity<ControllerResponse> response = restTemplate.getForEntity("/api/instruments/sync", ControllerResponse.class);
 
@@ -66,5 +66,23 @@ public class InstrumentControllerIntegrationTest {
         assertEquals(instrumentName, syncedInstrument.getFullName());
         assertEquals(instrumentMarketId, syncedInstrument.getMarket().getId());
         assertEquals(instrumentCustomName, syncedInstrument.getSimpleName());
+    }
+
+    /**
+     * case : sync instrument data with success
+     * condition : returns HttpStatus Ok and synced instrument data in db is proper
+     */
+    @Test
+    public void testGetAllInstrumentsWithSuccess() {
+        ResponseEntity<ControllerResponse> response = restTemplate.getForEntity("/api/instruments", ControllerResponse.class);
+
+        // Assertions
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(ResponseStatus.SUCCESS, response.getBody().getStatus());
+
+        ObjectMapper mapper = new ObjectMapper();
+        List<InstrumentDto> returnedInstrumentList = mapper.convertValue(response.getBody().getData().get(0), List.class);
+
+        assertFalse(returnedInstrumentList.isEmpty());
     }
 }
