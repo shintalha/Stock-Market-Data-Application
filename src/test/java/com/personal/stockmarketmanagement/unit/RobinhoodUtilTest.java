@@ -40,7 +40,7 @@ public class RobinhoodUtilTest {
 
     /**
      * case : map robinhoodMarketDto list with 2 marketDto objects to market list
-     * cobdition : if method succeed, market object have proper data according to robinhoodMarketDto
+     * condition : if method succeed, market object have proper data according to robinhoodMarketDto
      */
     @Test
     public void testMapRobinhoodMarketDtoListToMarketListWithValidRobinhoodMarketDtoList() {
