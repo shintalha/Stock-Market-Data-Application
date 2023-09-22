@@ -18,4 +18,6 @@ public interface InstrumentRepository extends JpaRepository<Instrument, Long> {
                               @Param("simpleName") String simpleName,
                               @Param("marketId") int marketId,
                               @Param("id") Long id);
+
+    public Instrument findInstrumentBySymbol(String symbol);
 }

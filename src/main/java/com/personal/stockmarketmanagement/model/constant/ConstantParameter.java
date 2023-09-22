@@ -10,4 +10,7 @@ public final class ConstantParameter {
     public static final String DATABASE_ERROR = "There is a problem accessing the database for the relevant data.";
     public static final String GET_ALL_INSTRUMENTS_SUCCESS = "All instruments retrieved successfully";
     public static final String GET_ALL_INSTRUMENTS_ERROR = "Failed to retrieve instruments.";
+    public static final String INSTRUMENT_BY_SYMBOL_NOT_FOUND_ERROR = "There is no record of instrument with the symbol given.";
+    public static final String GET_INSTRUMENT_BY_SYMBOL_SUCCESS = "Instrument by given symbol retrieved successfully";
+    public static final String GET_INSTRUMENT_BY_SYMBOL_ERROR = "Failed to retrieve instrument by given symbol.";
 }
