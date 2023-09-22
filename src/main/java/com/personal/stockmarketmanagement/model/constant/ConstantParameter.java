@@ -7,4 +7,7 @@ public final class ConstantParameter {
     public static final String MARKET_SYNC_ERROR = "Market data has been successfully updated.";
     public static final String INSTRUMENT_SYNC_SUCCESS = "Instrument data has been successfully updated.";
     public static final String INSTRUMENT_SYNC_ERROR = "Failed to update instrument.";
+    public static final String DATABASE_ERROR = "There is a problem accessing the database for the relevant data.";
+    public static final String GET_ALL_INSTRUMENTS_SUCCESS = "All instruments retrieved successfully";
+    public static final String GET_ALL_INSTRUMENTS_ERROR = "Failed to retrieve instruments.";
 }

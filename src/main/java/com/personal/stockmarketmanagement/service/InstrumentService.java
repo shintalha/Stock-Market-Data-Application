@@ -1,9 +1,12 @@
 package com.personal.stockmarketmanagement.service;
 
 import com.personal.stockmarketmanagement.dataprovider.DataProvider;
+import com.personal.stockmarketmanagement.model.dto.InstrumentDto;
 import com.personal.stockmarketmanagement.model.entity.Instrument;
 import com.personal.stockmarketmanagement.model.entity.Market;
+import com.personal.stockmarketmanagement.model.exception.DatabaseConnectionException;
 import com.personal.stockmarketmanagement.repository.InstrumentRepository;
+import com.personal.stockmarketmanagement.utility.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,20 @@ public class InstrumentService {
 
     @Autowired
     MarketService marketService;
+
+    /**
+     * get all instrument data from db
+     * @return instrument list
+     * @throws DatabaseConnectionException if there is an error during db connection
+     */
+    public List<InstrumentDto> getAllInstruments() throws Exception {
+        try {
+            List<Instrument> instrumentList = instrumentRepository.findAll();
+            return Util.mapInstrumentEntityListToDtoList(instrumentList);
+        } catch (Exception ex) {
+            throw new DatabaseConnectionException(ex.getMessage());
+        }
+    }
 
     @CacheEvict(value = "instrument", allEntries = true)
     public void syncAllInstrumentData() throws Exception {
