@@ -21,6 +21,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 import static com.personal.stockmarketmanagement.model.constant.ConstantParameter.DATABASE_ERROR;
+import static com.personal.stockmarketmanagement.model.constant.ConstantParameter.INSTRUMENT_BY_SYMBOL_NOT_FOUND_ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.times;
@@ -228,7 +229,7 @@ public class InstrumentServiceTest {
     }
 
     /**
-     * Error during database connection
+     * case : Error during database connection
      * condition : should throw DatabaseConnectionException
      */
     @Test
@@ -242,5 +243,50 @@ public class InstrumentServiceTest {
         }
     }
 
+    /**
+     * case : get instrument by symbol successfully
+     * condition : should return right instrument according to the given symbol
+     */
+    @Test
+    public void testGetInstrumentBySymbolWithValidInstrument() {
+        Instrument instrument = Instrument.builder()
+                .id(1)
+                .symbol("AAPL")
+                .simpleName("Apple")
+                .fullName("Apple Inc.")
+                .build();
+
+        Mockito.when(instrumentRepository.findInstrumentBySymbol("AAPL")).thenReturn(instrument);
+
+        // Act
+        InstrumentDto instrumentDto = null;
+        try {
+            instrumentDto = instrumentService.getInstrumentBySymbol("AAPL");
+        } catch (Exception ex) {}
+
+        // Assert
+        assertEquals(1, instrumentDto.getId());
+        assertEquals("AAPL", instrumentDto.getSymbol());
+        assertEquals("Apple", instrumentDto.getSimpleName());
+        assertEquals("Apple Inc.", instrumentDto.getFullName());
+        assertNull(instrumentDto.getMarketId());
+    }
+
+    /**
+     * case : get instrument by symbol failed
+     * condition : should throw InstrumentNotFoundException
+     */
+    @Test
+    public void testGetInstrumentBySymbolWithInstrumentNotFoundException() {
+        String testSymbol = "GOOGL";
+        Mockito.when(instrumentRepository.findInstrumentBySymbol(testSymbol)).thenReturn(null);
+
+        // Assert that InstrumentNotFoundException is thrown
+        try {
+            instrumentService.getInstrumentBySymbol(testSymbol);
+        } catch (Exception ex) {
+            assertEquals(INSTRUMENT_BY_SYMBOL_NOT_FOUND_ERROR + " Symbol: " + testSymbol, ex.getMessage());
+        }
+    }
 
 }
