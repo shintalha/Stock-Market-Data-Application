@@ -12,10 +12,10 @@ import org.springframework.stereotype.Repository;
 public interface InstrumentRepository extends JpaRepository<Instrument, Long> {
     @Modifying
     @Transactional
-    @Query(value = "UPDATE instrument SET name = :name, custom_name = :customName, market_id = :marketId \n" +
+    @Query(value = "UPDATE instrument SET full_name = :fullName, simple_name = :simpleName, market_id = :marketId \n" +
             "WHERE id = :id", nativeQuery = true)
-    void updateInstrumentData(@Param("name") String name,
-                              @Param("customName") String customName,
+    void updateInstrumentData(@Param("fullName") String fullName,
+                              @Param("simpleName") String simpleName,
                               @Param("marketId") int marketId,
                               @Param("id") Long id);
 }
