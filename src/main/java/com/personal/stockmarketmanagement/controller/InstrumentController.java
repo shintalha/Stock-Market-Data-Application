@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -55,6 +56,28 @@ public class InstrumentController {
             ControllerResponse controllerResponse = ControllerResponse.builder()
                     .status(ResponseStatus.ERROR)
                     .message(GET_ALL_INSTRUMENTS_ERROR)
+                    .additionalInfo(ex.getMessage())
+                    .build();
+            return new ResponseEntity<>(controllerResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/api/instruments/{symbol}")
+    public ResponseEntity<ControllerResponse> getInstrumentBySymbol(@PathVariable String symbol) {
+        try {
+            InstrumentDto instrumentDto = instrumentService.getInstrumentBySymbol(symbol);
+
+            ControllerResponse controllerResponse = ControllerResponse.builder()
+                    .status(ResponseStatus.SUCCESS)
+                    .message(GET_INSTRUMENT_BY_SYMBOL_SUCCESS)
+                    .initializeDataAndAdd(instrumentDto)
+                    .build();
+
+            return new ResponseEntity<>(controllerResponse, HttpStatus.OK);
+        } catch (Exception ex) {
+            ControllerResponse controllerResponse = ControllerResponse.builder()
+                    .status(ResponseStatus.ERROR)
+                    .message(GET_INSTRUMENT_BY_SYMBOL_ERROR)
                     .additionalInfo(ex.getMessage())
                     .build();
             return new ResponseEntity<>(controllerResponse, HttpStatus.INTERNAL_SERVER_ERROR);

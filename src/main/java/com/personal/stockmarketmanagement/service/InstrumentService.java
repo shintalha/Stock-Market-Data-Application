@@ -5,15 +5,19 @@ import com.personal.stockmarketmanagement.model.dto.InstrumentDto;
 import com.personal.stockmarketmanagement.model.entity.Instrument;
 import com.personal.stockmarketmanagement.model.entity.Market;
 import com.personal.stockmarketmanagement.model.exception.DatabaseConnectionException;
+import com.personal.stockmarketmanagement.model.exception.InstrumentNotFoundException;
 import com.personal.stockmarketmanagement.repository.InstrumentRepository;
 import com.personal.stockmarketmanagement.utility.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+
+import static com.personal.stockmarketmanagement.utility.Util.convertInstrumentEntityToDto;
 
 @Service
 public class InstrumentService {
@@ -89,5 +93,19 @@ public class InstrumentService {
                 instrument.getMarket().getId(),
                 instrument.getId()
         );
+    }
+
+    /**
+     * get instrument data by symbol from db
+     * @return instrument data by given symbol
+     * @throws DatabaseConnectionException if there is an error during db connection
+     * @throws InstrumentNotFoundException if there is no instrument data with given symbol
+     */
+    @Cacheable(value = "instrument", unless="#result == null")
+    public InstrumentDto getInstrumentBySymbol(String symbol) throws Exception {
+        Instrument instrument = instrumentRepository.findInstrumentBySymbol(symbol);
+        if(instrument == null)
+            throw new InstrumentNotFoundException(symbol);
+        return convertInstrumentEntityToDto(instrument);
     }
 }

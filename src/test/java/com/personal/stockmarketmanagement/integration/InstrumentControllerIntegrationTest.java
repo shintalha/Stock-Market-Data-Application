@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.jdbc.Sql;
@@ -29,6 +30,9 @@ public class InstrumentControllerIntegrationTest {
 
     @Autowired
     private InstrumentRepository instrumentRepository;
+
+    @Autowired
+    private CacheManager cacheManager;
 
     @ServiceConnection
     protected static final PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer<>("postgres:15.3")
@@ -85,4 +89,70 @@ public class InstrumentControllerIntegrationTest {
 
         assertFalse(returnedInstrumentList.isEmpty());
     }
+
+    /**
+     * case : required Instrument returned with success and cached
+     * condition : returns HttpStatus Ok and relevant InstrumentDto, cache value with key of symbol is not null
+     */
+    @Test
+    public void testGetInstrumentBySymbolWithSuccess() {
+        ResponseEntity<ControllerResponse> response = restTemplate.getForEntity("/api/instruments/BA", ControllerResponse.class);
+
+        // Assertions
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(ResponseStatus.SUCCESS, response.getBody().getStatus());
+
+        String instrumentSymbol = "BA";
+        long instrumentId = 2;
+
+
+        ObjectMapper mapper = new ObjectMapper();
+        InstrumentDto returnedInstrument = mapper.convertValue(response.getBody().getData().get(0), InstrumentDto.class);
+
+        InstrumentDto cachedInstrument = cacheManager.getCache("instrument").get("BA", InstrumentDto.class);
+
+        assertEquals(instrumentSymbol, returnedInstrument.getSymbol());
+        assertEquals(instrumentId, returnedInstrument.getId());
+        assertNotNull(cachedInstrument);
+        assertEquals(instrumentSymbol, cachedInstrument.getSymbol());
+        assertEquals(instrumentId, cachedInstrument.getId());
+
+    }
+
+    /**
+     * case : get instrument data by symbol with error
+     * condition : returns HttpStatus INTERNAL_SERVER_ERROR
+     */
+    @Test
+    public void testGetInstrumentBySymbolWithError() {
+        ResponseEntity<ControllerResponse> response = restTemplate.getForEntity("/api/instruments/TEST", ControllerResponse.class);
+
+        // Assertions
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals(ResponseStatus.ERROR, response.getBody().getStatus());
+
+    }
+
+    /**
+     * case : get instrument by symbol and sync instrument datas
+     * condition : cached instrument should be deleted from cache after sync instrument executed
+     */
+    @Test
+    public void testSyncInstrumentDataWithCachedInstrument() {
+        ResponseEntity<ControllerResponse> getInstrumentBySymbolResponse = restTemplate.getForEntity("/api/instruments/BA", ControllerResponse.class);
+        assertEquals(HttpStatus.OK, getInstrumentBySymbolResponse.getStatusCode());
+        assertEquals(ResponseStatus.SUCCESS, getInstrumentBySymbolResponse.getBody().getStatus());
+
+        InstrumentDto cachedInstrument = cacheManager.getCache("instrument").get("BA", InstrumentDto.class);
+        assertNotNull(cachedInstrument);
+
+        ResponseEntity<ControllerResponse> response = restTemplate.getForEntity("/api/instruments/sync", ControllerResponse.class);
+        cachedInstrument = cacheManager.getCache("instrument").get("BA", InstrumentDto.class);
+
+        assertNull(cachedInstrument);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(ResponseStatus.SUCCESS, response.getBody().getStatus());
+    }
+
+
 }

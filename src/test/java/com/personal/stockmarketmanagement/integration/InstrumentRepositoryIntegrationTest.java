@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.util.List;
@@ -21,7 +20,7 @@ public class InstrumentRepositoryIntegrationTest {
             .withDatabaseName("testdb")
             .withUsername("talha")
             .withPassword("postgres")
-            .withInitScript("scripts/create-tables.sql");
+            .withInitScript("scripts/init-all.sql");
     static {
         postgreSQLContainer.start();
     }
@@ -33,7 +32,6 @@ public class InstrumentRepositoryIntegrationTest {
      * condition : size of returned instrument list should be 5
      */
     @Test
-    @Sql("/scripts/seed-instrument.sql")
     @Transactional
     public void testFindAllInstrumentData() {
         List<Instrument> instrumentList = instrumentRepository.findAll();
@@ -46,7 +44,6 @@ public class InstrumentRepositoryIntegrationTest {
      * case: update entity successfully
      */
     @Test
-    @Sql("/scripts/seed-instrument.sql")
     @Transactional
     public void testUpdateInstrumentData() {
         Long instrumentId = 2L;
@@ -63,4 +60,28 @@ public class InstrumentRepositoryIntegrationTest {
         assertEquals(market_id, updatedInstrument.getMarket().getId());
 
     }
+
+    /**
+     * case : find existing instrument data by symbol
+     * condition : if method gets the relevant instrument data
+     */
+    @Test
+    public void testFindInstrumentBySymbolByExistingData() {
+        String symbol = "AAPL";
+        String customName = "Apple";
+        Instrument instrument = instrumentRepository.findInstrumentBySymbol(symbol);
+        assertNotNull(instrument);
+        assertEquals(customName, instrument.getSimpleName());
+    };
+
+    /**
+     * case : try to find non-existing instrument data by symbol
+     * condition : if method returns null
+     */
+    @Test
+    public void testFindInstrumentBySymbolByNonExistingData() {
+        String symbol = "test";
+        Instrument instrument = instrumentRepository.findInstrumentBySymbol(symbol);
+        assertNull(instrument);
+    };
 }
