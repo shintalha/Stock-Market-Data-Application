@@ -4,6 +4,7 @@ import com.personal.stockmarketmanagement.model.constant.ResponseStatus;
 import com.personal.stockmarketmanagement.model.contracts.controller.ControllerResponse;
 import com.personal.stockmarketmanagement.model.dto.InstrumentDto;
 import com.personal.stockmarketmanagement.service.InstrumentService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ public class InstrumentController {
     InstrumentService instrumentService;
 
     @GetMapping("/api/instruments/sync")
+    @Operation(summary = "Sync instrument data in database with instrument data in data provider")
     public ResponseEntity<ControllerResponse> syncMarketData() {
         try {
             instrumentService.syncAllInstrumentData();
@@ -41,6 +43,7 @@ public class InstrumentController {
     }
 
     @GetMapping("/api/instruments")
+    @Operation(summary = "Retrieves all instrument data from database")
     public ResponseEntity<ControllerResponse> getAllInstruments() {
         try {
             List<InstrumentDto> instrumentDtoList = instrumentService.getAllInstruments();
@@ -63,6 +66,7 @@ public class InstrumentController {
     }
 
     @GetMapping("/api/instruments/{symbol}")
+    @Operation(summary = "Retrieve an instrument data by its symbol")
     public ResponseEntity<ControllerResponse> getInstrumentBySymbol(@PathVariable String symbol) {
         try {
             InstrumentDto instrumentDto = instrumentService.getInstrumentBySymbol(symbol);

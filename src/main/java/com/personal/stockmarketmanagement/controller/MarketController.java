@@ -3,6 +3,7 @@ package com.personal.stockmarketmanagement.controller;
 import com.personal.stockmarketmanagement.model.constant.ResponseStatus;
 import com.personal.stockmarketmanagement.model.contracts.controller.ControllerResponse;
 import com.personal.stockmarketmanagement.service.MarketService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ public class MarketController {
     MarketService marketService;
 
     @GetMapping("/api/markets/sync")
+    @Operation(summary = "Sync market datas in database with market datas in data provider")
     public ResponseEntity<ControllerResponse> syncMarketData() {
         try {
             marketService.syncMarketData();
