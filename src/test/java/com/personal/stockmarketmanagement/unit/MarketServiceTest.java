@@ -44,7 +44,7 @@ public class MarketServiceTest {
     private final String market2Website = "www.iextrading.com";
 
     /**
-     * Case : method throws MarketDataFetchException
+     * case : method throws MarketDataFetchException
      * Condition : if getMarkets method return Optional.empty(no market data), then service must throw MarketDataFetchException
      */
     @Test
@@ -65,7 +65,7 @@ public class MarketServiceTest {
     }
 
     /**
-     * method successfully executed
+     * case : method successfully executed
      * condition : save method is executed if method is succeeded
      */
     @Test
